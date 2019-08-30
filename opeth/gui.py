@@ -10,7 +10,7 @@ from timeit import default_timer
 import pickle # for storing parameters
 from collections import defaultdict
 from comm import CommProcess
-from colldata import DataProc, EVENT_ROI, SAMPLES_PER_SEC, BIN_SIZE
+from colldata import DataProc, EVENT_ROI, SAMPLES_PER_SEC, SPIKE_HOLDOFF
 from pprint import pprint
 import os.path
 import re

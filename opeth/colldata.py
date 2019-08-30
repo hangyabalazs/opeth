@@ -20,13 +20,9 @@ from collections import OrderedDict, deque, defaultdict
 from openephys import generate_ttl
 from circbuff import CircularBuffer
 
-
 EVENT_ROI = (-0.02, 0.05)       #: Region of interest in seconds (+-timestamp range in seconds - neighbourhood of a event that is investigated for spikes)
 
-# protocol: 20 Hz for 2 sec (40 pulse 1 ms TTL), then 3 sec pause - repeated 30x
-BIN_SIZE = 0.001                #: Bin size for spike histograms (seconds)
-
-SAMPLES_PER_SEC = 30000         #: Sampling frequency in Hz
+SAMPLES_PER_SEC = 20000         #: Sampling frequency in Hz
 TIMESTAMP_PER_SEC = SAMPLES_PER_SEC
 MAX_DATA_AMOUNT = 2 * TIMESTAMP_PER_SEC   #: Buffering limit (sample count)
 
