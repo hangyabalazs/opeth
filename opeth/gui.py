@@ -196,6 +196,7 @@ class GuiClass(object):
         self.trigger_nearest_ts = 0.0
         self.channels_per_plot = CHANNELS_PER_HISTPLOT
         self.should_restore_params = True   #: Automatic parameter reload should happen only on startup.
+        self.downsampling_rate = SAMPLES_PER_SEC // 1000 #: Downsampling rate is calculated from sampling rate, target is 1kHz for raw data window
 
         # true if system shutdown in progress
         self.closing = False
@@ -1152,7 +1153,7 @@ class GuiClass(object):
         start = default_timer()
 
         # realtime display of 1 sec long signals - reducing plot complexity
-        datacomp, tscomp = self.dataproc.compress(data, 30, ts)
+        datacomp, tscomp = self.dataproc.compress(data, self.downsampling_rate, ts)
         tscomp = tscomp - tscomp[0] # start time from 0
         self.elapsed += default_timer() - start
         self.timeas.toc("03-data")
