@@ -337,7 +337,15 @@ class GuiClass(object):
 
         # display a placeholder window instead of histograms until data arrives
         waitDock = Dock("Awaiting data")
-        label = QtGui.QLabel("<h2>Awaiting data... </h2><br/><h3>Please start Open Ephys!</h3>")
+        msg = '<h2>Awaiting data... </h2><br/><h3>Please start Open Ephys!</h3><br/>'
+        msg += '<table align="center">'
+        msg += '<tr><th colspan=2 align="left" style="padding-left:1.5em">HARD-CODED DEFAULTS (see gui.py and colldata.py):</th></tr>'
+        msg += '<tr><th align="left">Sampling rate (SAMPLES_PER_SEC):</th><td style="padding-left:1em">%d</td></tr>' % SAMPLES_PER_SEC
+        msg += '<tr><th align="left">Spike censoring time (SPIKE_HOLDOFF):</th><td style="padding-left:1em">%.2f ms</td></tr>' % (SPIKE_HOLDOFF * 1000)
+        msg += '<tr><th align="left">Histogram bin size (HISTOGRAM_BINSIZE):</th><td style="padding-left:1em">%.2f ms</td></tr>' % (HISTOGRAM_BINSIZE * 1000)        
+        msg += '<tr><th align="left">Inverted spike detection (NEGATIVE_THRESHOLD):</th><td style="padding-left:1em">%s</td></tr>' % ('yes' if NEGATIVE_THRESHOLD else 'no')        
+        msg += '</table>'
+        label = QtGui.QLabel(msg)
         label.setAlignment(QtCore.Qt.AlignCenter | QtCore.Qt.AlignVCenter)
         waitDock.addWidget(label)
         self.docks = [waitDock]
