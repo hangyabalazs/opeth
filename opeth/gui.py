@@ -481,8 +481,8 @@ class GuiClass(object):
             self.histplots.append(histplots)
             self.channelplots.append(channelplots)
 
-        self.hist_x = np.linspace(EVENT_ROI[0], EVENT_ROI[1], int(round(
-                (EVENT_ROI[1] - EVENT_ROI[0] + HISTOGRAM_BINSIZE) / HISTOGRAM_BINSIZE)))
+        self.hist_x = np.linspace(self.event_roi[0], self.event_roi[1], int(round(
+                (self.event_roi[1] - self.event_roi[0] + HISTOGRAM_BINSIZE) / HISTOGRAM_BINSIZE)))
 
     def update_plotcolors(self):
         '''Called when channels get disabled - no need to remove plots'''
@@ -514,10 +514,10 @@ class GuiClass(object):
         self.par_disabled_ch = Parameter.create(name="Disabled channels", type='str', value="")
         self.param.addChild(self.par_disabled_ch)
 
-        self.par_ttlroi_before = Parameter.create(name='ROI before event', type='float', value=EVENT_ROI[0], step=1e-3, siPrefix=True,
+        self.par_ttlroi_before = Parameter.create(name='ROI before event', type='float', value=self.event_roi[0], step=1e-3, siPrefix=True,
                                                   limits=(-500, 500), suffix='s')
         self.param.addChild(self.par_ttlroi_before)
-        self.par_ttlroi_after = Parameter.create(name='ROI after event', type='float', value=EVENT_ROI[1], step=1e-3, siPrefix=True,
+        self.par_ttlroi_after = Parameter.create(name='ROI after event', type='float', value=self.event_roi[1], step=1e-3, siPrefix=True,
                                                  limits=(-500, 500), suffix='s')
         self.param.addChild(self.par_ttlroi_after)
 
