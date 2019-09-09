@@ -45,6 +45,8 @@ SPIKEWIN = False            #: Set to True if one spike analysis window is to be
 HIDE_AUX_CHANNELS = True    #: Whether AUXiliary channels - in 35 channel case: last 3 channels, in 70 channel case last 6 - should be omitted.
 CHANNELPLOTS_VERTICAL_OFFSET = 0.1  #: When histogram are presented with lines per channel, adjust the way they are plotted.
 CHANNELPLOTS_ANTIALIASED = True #: More professional display for per channel plots, but less visible
+MAX_CHANNELS_PER_PLOT = 8   #: Maximal number of channels for a given histogram window/polytrode
+MAX_TRIGGER_CHANNEL = 8     #: TTL trigger channel is up to 8 for a BNC expansion board
 NEGATIVE_THRESHOLD = True   #: Inverted signal - positive threshold value in params mean negative threshold with falling edge detection
 
 DEBUG = False               #: Enable or disable debug mode
@@ -506,8 +508,10 @@ class GuiClass(object):
         # tetrode threshold parameters
         self.param = Parameter.create(name='params', type='group')
         self.par_ttl_src = Parameter.create(name='Event trigger channel', type='int', limits=(1,8))
+        self.par_ttl_src = Parameter.create(name='Event trigger channel', type='int', limits=(1, MAX_TRIGGER_CHANNEL))
         self.param.addChild(self.par_ttl_src)
-        self.par_ch_per_plot = Parameter.create(name='Channels per plot', type='int',  limits=(1,8),
+        
+        self.par_ch_per_plot = Parameter.create(name='Channels per plot', type='int',  limits=(1, MAX_CHANNELS_PER_PLOT),
                                                 value=CHANNELS_PER_HISTPLOT)
         self.param.addChild(self.par_ch_per_plot)
 
@@ -517,6 +521,7 @@ class GuiClass(object):
         self.par_ttlroi_before = Parameter.create(name='ROI before event', type='float', value=self.event_roi[0], step=1e-3, siPrefix=True,
                                                   limits=(-500, 500), suffix='s')
         self.param.addChild(self.par_ttlroi_before)
+        
         self.par_ttlroi_after = Parameter.create(name='ROI after event', type='float', value=self.event_roi[1], step=1e-3, siPrefix=True,
                                                  limits=(-500, 500), suffix='s')
         self.param.addChild(self.par_ttlroi_after)
@@ -786,7 +791,7 @@ class GuiClass(object):
                                   (self.event_roi[1] - self.event_roi[0] + HISTOGRAM_BINSIZE) / HISTOGRAM_BINSIZE)))
 
         if clear_plot:
-            self.onClearPlot()
+            self.clear_plot()
         logger.info("Stimulus roi updated:" + str(self.event_roi))
 
 
@@ -917,6 +922,12 @@ class GuiClass(object):
             else:   # default if unknown type encountered
                 self.par_histcolor.setValue(PLOT_FLAT)
 
+        if cfg.has_option("plot", "channels_per_plot"):
+            channels_per_plot = cfg.getint("plot", "channels_per_plot")
+            # limit to values between 1 and MAX_CHANNELS_PER_PLOT
+            channels_per_plot = max(min(MAX_CHANNELS_PER_PLOT, channels_per_plot), 1)
+            self.par_ch_per_plot.setValue(channels_per_plot)
+
         if cfg.has_option("processing", "roi_before"):
             before = cfg.getfloat("processing", "roi_before")
             self.par_ttlroi_before.setValue(before)
@@ -971,10 +982,14 @@ class GuiClass(object):
         '''Open new spike analysis window on button press.'''
         self.spikewins.append(SpikeEvalGui(SAMPLES_PER_SEC))
 
-    def onClearPlot(self):
-        '''Manually clear plots on button press.'''
+    def clear_plot(self):
+        ''' Clear all displayed histograms '''
         self.spike_bin_ms = np.zeros((self.cp.collector.channel_cnt(), self.ttl_range_ms + 1))
         self.force_update = True
+
+    def onClearPlot(self):
+        '''Manually clear plots on button press.'''
+        self.clear_plot()
 
     def update_histograms(self):
         '''Update displayed histogram plots.
