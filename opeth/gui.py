@@ -198,6 +198,7 @@ class GuiClass(object):
         self.trigger_nearest_ts = 0.0
         self.channels_per_plot = CHANNELS_PER_HISTPLOT
         self.should_restore_params = True   #: Automatic parameter reload should happen only on startup.
+        self.sampling_rate = SAMPLES_PER_SEC
         self.downsampling_rate = SAMPLES_PER_SEC // 1000 #: Downsampling rate is calculated from sampling rate, target is 1kHz for raw data window
 
         # true if system shutdown in progress
@@ -209,7 +210,7 @@ class GuiClass(object):
         self.timeas = TimeMeasClass()       #: Profiling class
 
         self.disabled_channels = []         #: A list of disabled channels starting with 0
-        self.disabled_channel_update_at = None  # pyqtgraph parameters can't be updated from within the change handler?
+        self.disabled_channel_update_at = None  # pyqtgraph parameters can't be updateupdated from within the change handler?
         self.disabled_channel_update_to = ''    # doing that instead from the update routine
 
         self.event_roi = list(EVENT_ROI)
@@ -270,6 +271,18 @@ class GuiClass(object):
         self.populate_histwin()
         self.populate_params()
         self.initiated = True
+
+    def update_samplingrate(self, sampling_rate, clear_plot=False):
+        self.sampling_rate = sampling_rate
+        for w in self.spikewins:
+            w.set_sampling_rate(sampling_rate)
+        self.cp.collector.set_sampling_rate(sampling_rate)
+        self.dataproc.set_sampling_rate(sampling_rate)
+        
+        if clear_plot:
+            self.clear_plot()
+        
+        logger.info("New sampling rate: %d" % self.sampling_rate)
 
     def update_plotstyle(self):
         '''If the plot style changes from one of the histogram plots to channel plot
@@ -342,8 +355,7 @@ class GuiClass(object):
         waitDock = Dock("Awaiting data")
         msg = '<h2>Awaiting data... </h2><br/><h3>Please start Open Ephys!</h3><br/>'
         msg += '<table align="center">'
-        msg += '<tr><th colspan=2 align="left" style="padding-left:1.5em">HARD-CODED DEFAULTS (see gui.py and colldata.py):</th></tr>'
-        msg += '<tr><th align="left">Sampling rate (SAMPLES_PER_SEC):</th><td style="padding-left:1em">%d</td></tr>' % SAMPLES_PER_SEC
+        msg += '<tr><th colspan=2 align="left" style="padding-left:1.5em">DEFAULTS in code (see gui.py and colldata.py):</th></tr>'
         msg += '<tr><th align="left">Spike censoring time (SPIKE_HOLDOFF):</th><td style="padding-left:1em">%.2f ms</td></tr>' % (SPIKE_HOLDOFF * 1000)
         msg += '<tr><th align="left">Histogram bin size (HISTOGRAM_BINSIZE):</th><td style="padding-left:1em">%.2f ms</td></tr>' % (HISTOGRAM_BINSIZE * 1000)        
         msg += '<tr><th align="left">Inverted spike detection (NEGATIVE_THRESHOLD):</th><td style="padding-left:1em">%s</td></tr>' % ('yes' if NEGATIVE_THRESHOLD else 'no')        
@@ -507,7 +519,10 @@ class GuiClass(object):
 
         # tetrode threshold parameters
         self.param = Parameter.create(name='params', type='group')
-        self.par_ttl_src = Parameter.create(name='Event trigger channel', type='int', limits=(1,8))
+        self.par_sampling_rate = Parameter.create(name='Sampling rate', type='int', value=self.sampling_rate,
+                                                 limits=(1000, 200000), siPrefix=True, suffix='Hz')
+        self.param.addChild(self.par_sampling_rate)
+        
         self.par_ttl_src = Parameter.create(name='Event trigger channel', type='int', limits=(1, MAX_TRIGGER_CHANNEL))
         self.param.addChild(self.par_ttl_src)
         
@@ -658,7 +673,7 @@ class GuiClass(object):
 
     def init_spikewin(self):
         ''' Single channel analysis window '''
-        self.spikewins = [SpikeEvalGui(SAMPLES_PER_SEC)]
+        self.spikewins = [SpikeEvalGui(self.sampling_rate)]
 
     def set_threshold_levels(self, value):
         '''Parameter setup: update all the tetrode threshold level values simultaneously.'''
@@ -800,22 +815,25 @@ class GuiClass(object):
         need_threshupdate = False
 
         for param, change, data in changes:
-            if param == self.par_common_thresh and change == 'value':
-                self.set_threshold_levels(data)
-                need_threshupdate = True
-            elif param == self.par_ttlroi_before and change == 'value':
-                self.change_event_roi((data, self.event_roi[1]))
-            elif param == self.par_ttlroi_after and change == 'value':
-                self.change_event_roi((self.event_roi[0], data))
-            elif param == self.par_disabled_ch and change == 'value':
-                self.update_disabled_channels()
-            elif param in self.par_tetrode_thresh and change == 'value':
-                need_threshupdate = True
-            elif param == self.par_ch_per_plot and change == 'value':
-                self.channels_per_plot = int(self.par_ch_per_plot.value())
-                self.update_channelcnt(self.cp.collector.channel_cnt())
-            elif param == self.par_histcolor and change == 'value':
-                self.update_plotstyle()
+            if change == 'value':
+                if param == self.par_sampling_rate:
+                    self.update_samplingrate(data)
+                elif param == self.par_common_thresh:
+                    self.set_threshold_levels(data)
+                    need_threshupdate = True
+                elif param == self.par_ttlroi_before:
+                    self.change_event_roi((data, self.event_roi[1]))
+                elif param == self.par_ttlroi_after:
+                    self.change_event_roi((self.event_roi[0], data))
+                elif param == self.par_disabled_ch:
+                    self.update_disabled_channels()
+                elif param in self.par_tetrode_thresh:
+                    need_threshupdate = True
+                elif param == self.par_ch_per_plot:
+                    self.channels_per_plot = int(self.par_ch_per_plot.value())
+                    self.update_channelcnt(self.cp.collector.channel_cnt())
+                elif param == self.par_histcolor:
+                    self.update_plotstyle()
 
         if need_threshupdate:
             self.update_threshold_levels()
@@ -891,6 +909,7 @@ class GuiClass(object):
         cfg.set("plot", "channels_per_plot", self.par_ch_per_plot.value())
 
         cfg.add_section("processing")
+        cfg.set("processing", "sampling_rate", self.par_sampling_rate.value())
         cfg.set("processing", "ttl_trigger_channel", self.par_ttl_src.value())
         cfg.set("processing", "roi_before", self.par_ttlroi_before.value())
         cfg.set("processing", "roi_after", self.par_ttlroi_after.value())
@@ -921,12 +940,19 @@ class GuiClass(object):
                 self.par_histcolor.setValue(histcolor)
             else:   # default if unknown type encountered
                 self.par_histcolor.setValue(PLOT_FLAT)
-
+                
         if cfg.has_option("plot", "channels_per_plot"):
             channels_per_plot = cfg.getint("plot", "channels_per_plot")
             # limit to values between 1 and MAX_CHANNELS_PER_PLOT
             channels_per_plot = max(min(MAX_CHANNELS_PER_PLOT, channels_per_plot), 1)
             self.par_ch_per_plot.setValue(channels_per_plot)
+
+        if cfg.has_option("processing", "sampling_rate"):
+            sampling_rate = cfg.getint("processing", "sampling_rate")
+            self.par_sampling_rate.setValue(sampling_rate)
+        else:
+            sampling_rate = self.par_sampling_rate.value()            
+        self.update_samplingrate(sampling_rate, clear_plot=False)
 
         if cfg.has_option("processing", "roi_before"):
             before = cfg.getfloat("processing", "roi_before")
@@ -1238,7 +1264,7 @@ class GuiClass(object):
 
             if len(data_ts) == 0:
                 return
-            data_ts = data_ts / float(SAMPLES_PER_SEC) # adjusted to seconds (instead of sample index)
+            data_ts = data_ts / float(self.sampling_rate) # adjusted to seconds (instead of sample index)
 
             data_ts_0 = data_ts - data_ts[0]    # timestamps starting at 0 for first sample
             data_ts_roi = data_ts_0 + self.event_roi[0]           # and to the TTL window (-20ms..+50ms)

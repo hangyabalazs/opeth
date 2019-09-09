@@ -108,6 +108,9 @@ class SpikeEvalGui(object):
         # other local variables
         self.earliest_plot = time.clock()   #: timestamp until new plot is created to limit update frequency 
 
+    def set_sampling_rate(self, sampling_rate):
+        self.sample_rate = sampling_rate
+
     def plot(self, data_ts, data, spike_ts, spike_pos, threshold_levels):
         '''Plot a set of data and corresponding spikes on the selected channel.
         

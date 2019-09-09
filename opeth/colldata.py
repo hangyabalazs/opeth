@@ -22,15 +22,12 @@ from circbuff import CircularBuffer
 
 EVENT_ROI = (-0.02, 0.05)       #: Region of interest in seconds (+-timestamp range in seconds - neighbourhood of a event that is investigated for spikes)
 
-SAMPLES_PER_SEC = 20000         #: Sampling frequency in Hz
-TIMESTAMP_PER_SEC = SAMPLES_PER_SEC
-MAX_DATA_AMOUNT = 2 * TIMESTAMP_PER_SEC   #: Buffering limit (sample count)
+SAMPLES_PER_SEC = 30000         #: Sampling frequency in Hz
 
 # default threshold level for spike detection
 SPIKE_THRESHOLD = 0.5
 # holdoff time in seconds (suppress spikes too nearby to each other)
 SPIKE_HOLDOFF = 0.00075         #: Dead time / censoring period (seconds)
-SPIKE_HOLDOFF_SAMPLES = int(round(SPIKE_HOLDOFF * SAMPLES_PER_SEC))
 
 DBG_TEXT_DUMP = False
 
@@ -64,7 +61,7 @@ class Collector(object):
         self.prev_trigger_ts = defaultdict(int)
         self.starttime = time.clock()
 
-        self.samples_per_sec = SAMPLES_PER_SEC
+        self.set_sampling_rate(SAMPLES_PER_SEC)
 
         self.drop_aux = False
         
@@ -88,7 +85,7 @@ class Collector(object):
         were received (ch 33-35 or ch 65-70) and :attr:`drop_aux` is True.
         
         Data sampling timestamps are calculated for each sample position based on the last received
-        timestamp (stored in :attr:`timestamp` and the sample rate hard-coded in :attr:`SAMPLES_PER_SEC`.
+        timestamp (stored in :attr:`timestamp` and the sample rate defaults to :attr:`SAMPLES_PER_SEC`.
         
         Args:
             data: input data received from OE. Multiple channels, multiple samples.
@@ -140,7 +137,7 @@ class Collector(object):
 
         assert(self.databuffer.shape[1] == self.tsbuffer.shape[0])
 
-        self.drop_before(self.timestamp - MAX_DATA_AMOUNT)
+        self.drop_before(self.timestamp - self.max_data_amount)
 
     def drop_before(self, timestamp):
         '''Drop old data which is not required for any of the various displays.
@@ -279,9 +276,9 @@ class Collector(object):
                 # normal case, new valid TTL detected - keep its timestamp for timeout
                 self.prev_trigger_ts[ttl_ch] = ttl.timestamp
 
-            tsrange_min = ttl.timestamp + start_offset * TIMESTAMP_PER_SEC
+            tsrange_min = ttl.timestamp + start_offset * self.timestamp_per_sec
             tsrange_min = max(tsrange_min, 0)
-            tsrange_max = ttl.timestamp + end_offset * TIMESTAMP_PER_SEC
+            tsrange_max = ttl.timestamp + end_offset * self.timestamp_per_sec
 
             #print "For TTL", ttl, ":"
             #print "Checking data in range", tsrange_min, "-", tsrange_max, "data available in range", self.tsbuffer[0], "-", self.tsbuffer[-1]
@@ -306,6 +303,11 @@ class Collector(object):
     def set_drop_aux(self, should_drop):
         '''Update AUX channel settings (whether we'd like to search for spikes on them or not).'''
         self.drop_aux = should_drop
+        
+    def set_sampling_rate(self, sampling_rate):
+        self.samples_per_sec = sampling_rate
+        self.timestamp_per_sec = sampling_rate # current open ephys report timestamps as sample index
+        self.max_data_amount = 2 * self.timestamp_per_sec   #: Buffering limit (sample count)
 
 class DataProc(object):
     '''Utility functions to handle collected data
@@ -323,7 +325,14 @@ class DataProc(object):
             
         self.coll = collector
         self.coll.set_drop_aux(drop_aux)
-        self.autottl_holdoff_value = int(0.04 * SAMPLES_PER_SEC)
+        
+        # initial setup - will be overridden after parameter updates
+        self.set_sampling_rate(SAMPLES_PER_SEC)
+        
+        # AutoTTL is used only in simulation: in case of missing trigger events
+        # generate them based on a selected channel's detected spikes.
+        #self.autottl_holdoff_value = int(0.04 * SAMPLES_PER_SEC)
+
         self.autottl_holdoff_until = 0
 
     def compress(self, data, rate, timestamps=None):
@@ -447,15 +456,21 @@ class DataProc(object):
                     # Continue processing after current spike
                     # - if spike is 'flat' (too many samples over threshold) then immediately when it's again
                     #   below threshold
-                    # - if spike is normal (shorter than SPIKE_HOLDOFF_SAMPLES) then not earlier than holdoff
+                    # - if spike is normal (shorter than spike_holdoff_samples) then not earlier than holdoff
                     #   (measured from first sample where spike is over threshold)
-                    offset = max(first_over + SPIKE_HOLDOFF_SAMPLES, next_within)
+                    offset = max(first_over + self.spike_holdoff_samples, next_within)
 
             spikepositions.append(ch_pos)
             spikestamps.append(ch_time)
 
         return spikepositions, spikestamps
-
+        
+    def set_sampling_rate(self, sampling_rate):
+        logger.info("Data processor assumes sampling rate %d" % sampling_rate)
+        self.spike_holdoff_samples = int(round(SPIKE_HOLDOFF * sampling_rate))
+        self.autottl_holdoff_value = int(0.04 * sampling_rate)
+        
+    # ONLY FOR DEBUG / SIMULATION
     def autottl(self, data, timestamps, base_timestamp, ch=0, threshold = SPIKE_THRESHOLD, **kwargs):
         '''Generate TTL signals based on threshold in a channel of data.
         
