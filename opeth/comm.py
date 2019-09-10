@@ -147,7 +147,7 @@ class CommProcess(object):
                 # Send every two seconds a "heartbeat" so that Open Ephys knows we're alive
                 # and also check for response
                 if self.socket_waits_reply:
-                    logger.error("No reply to heartbeat, retrying...")
+                    logger.error("No reply to heartbeat, retrying... (Don't panic. :) )")
                     self.last_heartbeat_time += 1.
                     if (time.time() - self.last_reply_time) > 10.:
                         # reconnecting the socket as per the "lazy pirate" pattern (see the ZeroMQ guide)
