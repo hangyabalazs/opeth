@@ -16,6 +16,7 @@ import os.path
 import re
 import numpy as np
 import math
+from enum import Enum
 
 # configparser: attempt for py3/py2.7 compatibility
 try:
@@ -43,8 +44,6 @@ TRIGGER_HOLDOFF = 0.001     #: Trigger holdoff in seconds
 RERECORD = False            #: True if data is to be saved for debug purposes
 SPIKEWIN = False            #: Set to True if one spike analysis window is to be opened at start.
 HIDE_AUX_CHANNELS = True    #: Whether AUXiliary channels - in 35 channel case: last 3 channels, in 70 channel case last 6 - should be omitted.
-CHANNELPLOTS_VERTICAL_OFFSET = 0.1  #: When histogram are presented with lines per channel, adjust the way they are plotted.
-CHANNELPLOTS_ANTIALIASED = True #: More professional display for per channel plots, but less visible
 MAX_CHANNELS_PER_PLOT = 8   #: Maximal number of channels for a given histogram window/polytrode
 MAX_TRIGGER_CHANNEL = 8     #: TTL trigger channel is up to 8 for a BNC expansion board
 NEGATIVE_THRESHOLD = True   #: Inverted signal - positive threshold value in params mean negative threshold with falling edge detection
@@ -75,8 +74,19 @@ VOLT_TO_UVOLT_MULTIPLIER = 1000000
 # Histogram color assignments
 BRUSHCOLORS = [(0,0,255,255), (0,220,220,255), (0,255,0,255), (0,180,0,255), # B,Cy,G,DarkG
                (220,0,220,255), (220,220,0,255), (140,140,140,255), (180,180,0,255)]
-LINECOLORS = [(0,0,255,255), (255,0,0,255), (0,255,0,255), (255,255,0,255),
+
+# settings for channel plots: line colors, thickness etc.
+LINECOLORS = [(255,255,0,255), (0,255,0,255), (255,0,0,255), (0,0,255,255),
               (255,0,255,255),(0,255,255,255), (140,140,140,255), (0,180,0,255)]
+LINECOLORS_WHITEBG = [(180,180,0,255),  (240,0,0,255), (0,240,0,255), (0,0,240,255),
+              (180,0,180,255),(0,180,180,255), (100,100,100,255), (0,120,0,255)]
+
+CHANNELPLOTS_VERTICAL_OFFSET = 0.1  #: When histogram are presented with lines per channel, adjust the way they are plotted.
+CHANNELPLOTS_ANTIALIASED = True     #: More professional display for per channel plots, but less visible
+
+class Theme(Enum):
+    dark = 0
+    publication = 1
 
 class TimeMeasClass(object):
     '''Performance monitoring/profiling class. (Just for development.)
@@ -210,17 +220,23 @@ class GuiClass(object):
         self.timeas = TimeMeasClass()       #: Profiling class
 
         self.disabled_channels = []         #: A list of disabled channels starting with 0
-        self.disabled_channel_update_at = None  # pyqtgraph parameters can't be updateupdated from within the change handler?
+        self.disabled_channel_update_at = None  # pyqtgraph parameters can't be updated from within the change handler?
         self.disabled_channel_update_to = ''    # doing that instead from the update routine
 
         self.event_roi = list(EVENT_ROI)
 
         self.configfname = "default.ini"
-        self.force_update = False            #: Keep track of programmatic parameter changes to prevent infinite loops.
+        self.force_update = False           #: Keep track of programmatic parameter changes to prevent infinite loops.
 
         if RERECORD:
             self.datafile = open('data.txt', 'wt')
             self.ttlfile = open('trigger.txt', 'wt')
+
+        # GUI colors
+        # by default start off with dark colors
+        self.display_theme = Theme.dark     #: display theme
+        self.display_brushcolors = BRUSHCOLORS  #: Histogram colors
+        self.display_linecolors = LINECOLORS    #: Channel plot (line) colors
 
         self.initgraph()
         self.mainwin.show()
@@ -469,7 +485,7 @@ class GuiClass(object):
             histplots = []
             for i in range(self.channels_per_plot):
                 ch_id = idx * self.channels_per_plot + i
-                color = BRUSHCOLORS[i] if ch_id not in self.disabled_channels else (255,255,255,0)
+                color = self.display_brushcolors[i] if ch_id not in self.disabled_channels else (255,255,255,0) # transparent
                 hp = w.plot(np.arange(2), np.arange(1), stepMode=True, fillLevel=0, brush=color)
                 # Make it sure that later channels of an aggregate plot are behind first channel
                 # so first channel of a plot is at bottom of the stack.
@@ -477,7 +493,7 @@ class GuiClass(object):
                 histplots.append(hp)
 
             # one last plot which is never disabled - for flat histograms
-            histplots.append(w.plot(np.arange(2), np.arange(1), stepMode=True, fillLevel=0, brush=BRUSHCOLORS[0]))
+            histplots.append(w.plot(np.arange(2), np.arange(1), stepMode=True, fillLevel=0, brush=self.display_brushcolors[0]))
 
             # All channels separately - would overlap so draw lines instead
             antialias = CHANNELPLOTS_ANTIALIASED
@@ -485,7 +501,8 @@ class GuiClass(object):
             channelplots = []
             for i in range(self.channels_per_plot):
                 ch_id = idx * self.channels_per_plot + i
-                color = LINECOLORS[i] if ch_id not in self.disabled_channels else (255,255,255,0)
+                
+                color = self.display_linecolors[i] if ch_id not in self.disabled_channels else (255,255,255,0) # transparent
 
                 pen = pg.mkPen(color=color, width=1)
                 self.channel_line_pens.append(pen)
@@ -502,14 +519,14 @@ class GuiClass(object):
         '''Called when channels get disabled - no need to remove plots'''
         # channel colors update - piece of cake
         for ch_id in range(self.nChannels):
-            color = LINECOLORS[ch_id % self.channels_per_plot] if ch_id not in self.disabled_channels else (255,255,255,0)
+            color = self.display_linecolors[ch_id % self.channels_per_plot] if ch_id not in self.disabled_channels else (255,255,255,0)
             self.channel_line_pens[ch_id].setColor(QtGui.QColor(*color))
 
         for plot_idx, histplot in enumerate(self.histplots):
             startid = plot_idx * self.channels_per_plot
             for i in range(self.channels_per_plot):
                 ch_id = startid + i
-                color = BRUSHCOLORS[i] if ch_id not in self.disabled_channels else (255,255,255,0)
+                color = self.display_brushcolors[i] if ch_id not in self.disabled_channels else (255,255,255,0)
                 #histplot[i].setFillBrush(color) # this would not work - creates a QColor???
                 # and causes a lot of exceptions
                 histplot[i].opts['fillBrush'] = color
@@ -580,8 +597,11 @@ class GuiClass(object):
         reset_params_btn = QtGui.QPushButton('Reset')
         reset_params_btn.setMinimumWidth(5)
         clear_btn = QtGui.QPushButton('Clear plot')
+        change_theme_btn = QtGui.QPushButton('Invert colours')
+
         open_spikes_btn = QtGui.QPushButton('Open new spike win')
         h1.addWidget(clear_btn)
+        h1.addWidget(change_theme_btn)
         h1.addWidget(open_spikes_btn)
         h2.addWidget(save_params_btn)
         h2.addWidget(save_as_params_btn)
@@ -598,6 +618,7 @@ class GuiClass(object):
         reset_params_btn.clicked.connect(self.onResetParams)
         load_params_btn.clicked.connect(self.onLoadParams)
         clear_btn.clicked.connect(self.onClearPlot)
+        change_theme_btn.clicked.connect(self.onChangeTheme)
         open_spikes_btn.clicked.connect(self.onOpenSpikeWin)
 
         self.param.sigTreeStateChanged.connect(self.onParamChange)
@@ -633,7 +654,7 @@ class GuiClass(object):
                 plot = hplots[ch % self.channels_per_plot]
                 ch_colors.append(plot.opts['fillBrush'])
         else: # flat
-            ch_colors = [BRUSHCOLORS[0]] * self.nChannels
+            ch_colors = [self.display_brushcolors[0]] * self.nChannels
             for ch in range(self.nChannels):
                 if ch in self.disabled_channels:
                     ch_colors[ch] = (255, 255, 255, 0)
@@ -1016,6 +1037,23 @@ class GuiClass(object):
     def onClearPlot(self):
         '''Manually clear plots on button press.'''
         self.clear_plot()
+
+    def onChangeTheme(self):
+        if self.display_theme == Theme.dark:
+            self.display_theme = Theme.publication
+            
+            pg.setConfigOption('background', 'w')
+            pg.setConfigOption('foreground', 'k')
+            self.display_linecolors = LINECOLORS_WHITEBG
+        else:
+            self.display_theme = Theme.dark
+            
+            pg.setConfigOption('background', 'k')
+            pg.setConfigOption('foreground', 'w')
+            self.display_linecolors = LINECOLORS
+
+        # force redrawing the plots to change colours
+        self.update_channelcnt(self.cp.collector.channel_cnt())
 
     def update_histograms(self):
         '''Update displayed histogram plots.
