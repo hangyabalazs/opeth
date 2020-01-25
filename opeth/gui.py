@@ -80,6 +80,7 @@ LINECOLORS = [(255,255,0,255), (0,255,0,255), (255,0,0,255), (0,0,255,255),
               (255,0,255,255),(0,255,255,255), (140,140,140,255), (0,180,0,255)]
 LINECOLORS_WHITEBG = [(180,180,0,255),  (240,0,0,255), (0,240,0,255), (0,0,240,255),
               (180,0,180,255),(0,180,180,255), (100,100,100,255), (0,120,0,255)]
+LINE_WIDTH = 3
 
 CHANNELPLOTS_VERTICAL_OFFSET = 0.1  #: When histogram are presented with lines per channel, adjust the way they are plotted.
 CHANNELPLOTS_ANTIALIASED = True     #: More professional display for per channel plots, but less visible
@@ -504,7 +505,7 @@ class GuiClass(object):
                 
                 color = self.display_linecolors[i] if ch_id not in self.disabled_channels else (255,255,255,0) # transparent
 
-                pen = pg.mkPen(color=color, width=1)
+                pen = pg.mkPen(color=color, width=LINE_WIDTH)
                 self.channel_line_pens.append(pen)
                 channelplots.append(w.plot(np.arange(1), np.arange(1), stepMode=False,
                             pen=pen, antialias=antialias))
