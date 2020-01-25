@@ -5,7 +5,7 @@ to store data received over network.
 
 Heavily based on Francesco Battaglia's sample implementation.
 '''
-
+from __future__ import print_function
 import time
 import logging
 import zmq
@@ -199,7 +199,7 @@ class CommProcess(object):
                             self.msgstat_start = time.clock()
 
                     if self.message_no != -1 and header['message_no'] != self.message_no + 1:
-                        logger.error("Missing a message at number", self.message_no)
+                        logger.error("Missing a message at number %d", self.message_no)
                     self.message_no = header['message_no']
                     if header['type'] == 'data':
                         c = header['content']

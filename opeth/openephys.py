@@ -21,7 +21,7 @@ class OpenEphysEvent(object):
         self.event_id = 0
         self.sample_num = 0
         self.event_channel = 0
-        self.numBytes = 0
+        self.num_bytes = 0
         self.data = b''
         self.timestamp = None
         self.__dict__.update(_d)
@@ -29,15 +29,11 @@ class OpenEphysEvent(object):
         self.type = OpenEphysEvent.event_types[self.type]
         if _data:
             self.data = _data
-            self.numBytes = len(_data)
+            self.num_bytes = len(_data)
 
         if self.type == 'TIMESTAMP':
             t = np.frombuffer(self.data, dtype=np.int64)
             self.timestamp = t[0]
-
-    #def set_data(self, _data):   
-    #    self.data = _data
-    #    self.numBytes = len(_data)
 
     def __str__(self):
         ds = self.__dict__.copy()
@@ -70,7 +66,7 @@ class OpenEphysSpikeEvent(object):
 def generate_ttl(timestamp, sample_num = 0):
     ''' Debug code to auto-generate TTLs based on threshold level in case of file playback. '''
 
-    #{'event_channel': 0, 'event_id': 1, u'timestamp': 519170, 'base_timestamp': 518912, 'numBytes': 8, 'type': 'TTL', 'sample_num': 258}
+    #{'event_channel': 0, 'event_id': 1, u'timestamp': 519170, 'base_timestamp': 518912, 'num_bytes': 8, 'type': 'TTL', 'sample_num': 258}
     e_template = {"type": 3, "timestamp": timestamp, "event_id": 1,
-        "base_timestamp": timestamp - sample_num, "sample_num": sample_num, "numBytes": 0}
+        "base_timestamp": timestamp - sample_num, "sample_num": sample_num, "num_bytes": 0}
     return OpenEphysEvent(e_template)

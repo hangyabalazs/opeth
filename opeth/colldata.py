@@ -10,7 +10,7 @@ Data, TTL and timestamp storage happens in :class:`Collector` class, and
 Spike detection and data compression for raw plotting are performed in :class:`DataProc`.
 '''
 
-from __future__ import division
+from __future__ import division, print_function
 import time
 import logging
 import  numpy as np
@@ -280,8 +280,8 @@ class Collector(object):
             tsrange_min = max(tsrange_min, 0)
             tsrange_max = ttl.timestamp + end_offset * self.timestamp_per_sec
 
-            #print "For TTL", ttl, ":"
-            #print "Checking data in range", tsrange_min, "-", tsrange_max, "data available in range", self.tsbuffer[0], "-", self.tsbuffer[-1]
+            #print("For TTL", ttl, ":")
+            #print("Checking data in range", tsrange_min, "-", tsrange_max, "data available in range", self.tsbuffer[0], "-", self.tsbuffer[-1])
 
             if tsrange_min < self.tsbuffer[0]: # corresponding data is already lost, drop this TTL
                 logger.info("TTL timestamp %d earlier than available data %d, skipping" % (tsrange_min, self.tsbuffer[0]))
