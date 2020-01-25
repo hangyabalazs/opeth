@@ -6,6 +6,12 @@ to store data received over network.
 Heavily based on Francesco Battaglia's sample implementation.
 '''
 from __future__ import print_function
+import sys
+if sys.version_info.major >= 3:
+    from time import perf_counter as clock
+else:
+    from time import clock
+
 import time
 import logging
 import zmq
@@ -186,17 +192,17 @@ class CommProcess(object):
 
                     if self.isStats: # statistics
                         if self.msgstat_start is None:
-                            self.msgstat_start = time.clock()
+                            self.msgstat_start = clock()
 
                         self.msgstat_size.append(len(message[1]))
 
-                        if self.msgstat_start + 1 < time.clock():
+                        if self.msgstat_start + 1 < clock():
                             logger.debug(len(self.msgstat_size))
                             sizes, counts = np.unique(self.msgstat_size, return_counts=True)
                             logger.debug(sizes, counts)
                             logger.debug(sum(counts), "messages", sum(self.msgstat_size), "bytes")
                             self.msgstat_size = []
-                            self.msgstat_start = time.clock()
+                            self.msgstat_start = clock()
 
                     if self.message_no != -1 and header['message_no'] != self.message_no + 1:
                         logger.error("Missing a message at number %d", self.message_no)

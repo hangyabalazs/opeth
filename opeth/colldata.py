@@ -11,6 +11,12 @@ Spike detection and data compression for raw plotting are performed in :class:`D
 '''
 
 from __future__ import division, print_function
+import sys
+if sys.version_info.major >= 3:
+    from time import perf_counter as clock
+else:
+    from time import clock
+    
 import time
 import logging
 import  numpy as np
@@ -59,7 +65,7 @@ class Collector(object):
         self.spikes = deque()
         self.ttls = deque()
         self.prev_trigger_ts = defaultdict(int)
-        self.starttime = time.clock()
+        self.starttime = clock()
 
         self.set_sampling_rate(SAMPLES_PER_SEC)
 
@@ -76,7 +82,7 @@ class Collector(object):
         self.timestamp = timestamp
         if DBG_TEXT_DUMP: flog.write("Timestamp: %d\n" % self.timestamp)
 
-        now = time.clock()
+        now = clock()
 
     def add_data(self, data):
         '''Append a new set of analog channel measurements to the end of the storage array.

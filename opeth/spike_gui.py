@@ -1,3 +1,9 @@
+import sys
+if sys.version_info.major >= 3:
+    from time import perf_counter as clock
+else:
+    from time import clock
+
 import time
 import logging
 import numpy as np
@@ -106,7 +112,7 @@ class SpikeEvalGui(object):
         logger.info("Spike win created")
 
         # other local variables
-        self.earliest_plot = time.clock()   #: timestamp until new plot is created to limit update frequency 
+        self.earliest_plot = clock()   #: timestamp until new plot is created to limit update frequency 
 
     def set_sampling_rate(self, sampling_rate):
         self.sample_rate = sampling_rate
@@ -122,7 +128,7 @@ class SpikeEvalGui(object):
             threshold_levels: per channel threshold level for plotting
         '''
         
-        if self.earliest_plot > time.clock():
+        if self.earliest_plot > clock():
             #print "Prevented too frequent plotting"
             return
 
@@ -163,7 +169,7 @@ class SpikeEvalGui(object):
                     pen=pg.mkPen(color=self.COLORS[self.spikeplotpool_next], width=self.PENWIDTH, antialias=True))
             self.spikeplotpool_next = (self.spikeplotpool_next + 1) % len(self.spikeplotpool)
 
-        self.earliest_plot = time.clock() + 1.0 / self.MAX_PLOT_PER_SEC
+        self.earliest_plot = clock() + 1.0 / self.MAX_PLOT_PER_SEC
 
     def close(self):
         '''Called when main window is closed.'''
