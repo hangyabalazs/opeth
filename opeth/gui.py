@@ -928,20 +928,20 @@ class GuiClass(object):
         cfg.add_section("plot")
         cfg.set("plot", "histogram_type", self.par_histcolor.value())
         ch_per_plot = int(self.par_ch_per_plot.value())
-        cfg.set("plot", "channels_per_plot", self.par_ch_per_plot.value())
+        cfg.set("plot", "channels_per_plot", str(self.par_ch_per_plot.value()))
 
         cfg.add_section("processing")
-        cfg.set("processing", "sampling_rate", self.par_sampling_rate.value())
-        cfg.set("processing", "ttl_trigger_channel", self.par_ttl_src.value())
-        cfg.set("processing", "roi_before", self.par_ttlroi_before.value())
-        cfg.set("processing", "roi_after", self.par_ttlroi_after.value())
-        cfg.set("processing", "spike_nthreshold", self.par_common_thresh.value())
+        cfg.set("processing", "sampling_rate", str(self.par_sampling_rate.value()))
+        cfg.set("processing", "ttl_trigger_channel", str(self.par_ttl_src.value()))
+        cfg.set("processing", "roi_before", str(self.par_ttlroi_before.value()))
+        cfg.set("processing", "roi_after", str(self.par_ttlroi_after.value()))
+        cfg.set("processing", "spike_nthreshold", str(self.par_common_thresh.value()))
         thresholds = [str(p.value()) for p in self.par_tetrode_thresh]
         cfg.set("processing", "spike_nthreshold_channels", ",".join(thresholds))
-        cfg.set("processing", "disabled_channels", self.par_disabled_ch.value())
+        cfg.set("processing", "disabled_channels", str(self.par_disabled_ch.value()))
 
         # store config options
-        with open(self.configfname, 'wb') as configfile:
+        with open(self.configfname, 'wt') as configfile:
             cfg.write(configfile)
 
     def load_params(self):
