@@ -67,7 +67,7 @@ COLUMN_INCREMENTS = [3, 8, 12, 20, 25, 30, 42, 64, 90, 110, 120, 130, 1000] #: A
 
 # Enumeration of the three different
 PLOT_FLAT, PLOT_AGGREGATE, PLOT_CHANNELS = 'flat', 'aggregate', 'channels'
-PLOT_TYPES = [PLOT_FLAT, PLOT_AGGREGATE, PLOT_CHANNELS]
+PLOT_TYPES = [PLOT_AGGREGATE, PLOT_FLAT, PLOT_CHANNELS]
 
 VOLT_TO_UVOLT_MULTIPLIER = 1000000
 
@@ -961,7 +961,7 @@ class GuiClass(object):
             if histcolor in PLOT_TYPES:
                 self.par_histcolor.setValue(histcolor)
             else:   # default if unknown type encountered
-                self.par_histcolor.setValue(PLOT_FLAT)
+                self.par_histcolor.setValue(PLOT_AGGREGATE)
                 
         if cfg.has_option("plot", "channels_per_plot"):
             channels_per_plot = cfg.getint("plot", "channels_per_plot")
