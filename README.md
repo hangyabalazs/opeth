@@ -44,7 +44,7 @@ Required non-default packages: pyzmq, pyqtgraph (and one of the qt versions for 
 
 ## Contributors
 
-Developed by András Széll <szell.andris@gmail.com> 
+Developed by Andras Szell (<szell.andris@gmail.com>)
   and other Hangyalab members (http://hangyalab.koki.hu/).
 
 Open Ephys ZMQ plugin connection is based on sample python scripts from 
