@@ -6,15 +6,20 @@
 Welcome to OPETH's documentation!
 =================================
 
+.. contents:: Table of Contents
+   :local:
+
+OPETH user documentation
+------------------------
+.. include:: ../../README.rst
+  :start-after: rtd-inclusion-marker-do-not-remove
+
 .. toctree::
-   :maxdepth: 2
+   :maxdepth: 3
    :caption: Contents:
+   
 
+For developers
+--------------
 
-
-Indices and tables
-==================
-
-* :ref:`genindex`
 * :ref:`modindex`
-* :ref:`search`

@@ -1,3 +1,5 @@
+''' PyQtGraph extensions. '''
+
 from pyqtgraph.Qt import QtGui, QtCore
 from pyqtgraph.ptime import time as pgtime
 from pyqtgraph.parametertree import Parameter, ParameterTree, registerParameterType, ParameterItem
