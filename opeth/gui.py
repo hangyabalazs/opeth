@@ -8,15 +8,13 @@ import signal
 import pyqtgraph as pg
 from timeit import default_timer
 import pickle # for storing parameters
-from collections import defaultdict
-from comm import CommProcess
-from colldata import DataProc, EVENT_ROI, SAMPLES_PER_SEC, SPIKE_HOLDOFF
 from pprint import pprint
 import os.path
 import re
 import numpy as np
 import math
 from enum import Enum
+from collections import defaultdict
 
 # configparser: attempt for py3/py2.7 compatibility
 try:
@@ -30,9 +28,11 @@ from pyqtgraph.parametertree import Parameter, ParameterTree
 import pyqtgraph as pg
 from pyqtgraph.dockarea import DockArea, Dock
 
-import logsetup
-from spike_gui import SpikeEvalGui
-import pgext
+import opeth.logsetup as logsetup
+from opeth.spike_gui import SpikeEvalGui
+import opeth.pgext as pgext
+from opeth.comm import CommProcess
+from opeth.colldata import DataProc, EVENT_ROI, SAMPLES_PER_SEC, SPIKE_HOLDOFF
 
 AUTOTRIGGER_CH = None       #: Set to None to disable, otherwise TTL pulses will be generated if given channel is over threshold
 HISTOGRAM_BINSIZE = 0.001   #: Histogram bin size in seconds
@@ -1398,8 +1398,7 @@ def sigint_handler(*args):
 
 logger = logsetup.init_logs("logs.txt")
 
-if __name__ == '__main__':
-    
+def main():
     app = QtGui.QApplication([])
     ui = GuiClass()
 
@@ -1412,3 +1411,6 @@ if __name__ == '__main__':
 
     if (sys.flags.interactive != 1) or not hasattr(QtCore, 'PYQT_VERSION'):
         QtGui.QApplication.instance().exec_()
+
+if __name__ == '__main__':
+    main()
