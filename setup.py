@@ -14,10 +14,12 @@ setuptools.setup(
     url="https://github.com/hangyabalazs/opeth",
     packages=setuptools.find_packages(),
     classifiers=[
+        "Development Status :: 4 - Beta",
+        "Programming Language :: Python :: 2.7",
         "Programming Language :: Python :: 3",
-        "License :: OSI Approved :: GNU General Public License v3 or later"
-            " (GPLv3+)",
+        "License :: OSI Approved :: GNU General Public License v3 or later (GPLv3+)",
         "Operating System :: OS Independent",
+        "Intended Audience :: Science/Research",
     ],
     entry_points = {
         'console_scripts': ['opeth=opeth.gui:main'],

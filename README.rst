@@ -65,7 +65,7 @@ Contributors
 Developed by Andras Szell (szell.andris@gmail.com) and other Hangyalab members (http://hangyalab.koki.hu/).
 
 Open Ephys ZMQ plugin connection is based on 
-`sample python scripts <https://github.com/MemDynLab/ZMQInterface/tree/master/python_clients>`_ from FP Battaglia.
+`sample python scripts <https://github.com/MemDynLab/ZMQInterface/tree/master/python_clients>`_ by Francesco Battaglia.
 
 License
 -------
