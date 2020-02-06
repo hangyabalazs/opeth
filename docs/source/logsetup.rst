@@ -1,7 +1,7 @@
 logsetup module
 ===============
 
-.. automodule:: logsetup
+.. automodule:: opeth.logsetup
     :members:
     :undoc-members:
     :show-inheritance:

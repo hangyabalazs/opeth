@@ -1,7 +1,7 @@
 pgext module
-===============
+============
 
-.. automodule:: pgext
+.. automodule:: opeth.pgext
     :members:
     :undoc-members:
     :show-inheritance:

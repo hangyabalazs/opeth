@@ -1,7 +1,7 @@
 circbuff module
 ===============
 
-.. automodule:: circbuff
+.. automodule:: opeth.circbuff
     :members:
     :undoc-members:
     :show-inheritance:

@@ -1,7 +1,7 @@
 spike\_gui module
 =================
 
-.. automodule:: spike_gui
+.. automodule:: opeth.spike_gui
     :members:
     :undoc-members:
     :show-inheritance:

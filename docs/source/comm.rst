@@ -1,7 +1,7 @@
 comm module
 ===========
 
-.. automodule:: comm
+.. automodule:: opeth.comm
     :members:
     :undoc-members:
     :show-inheritance:

@@ -1,7 +1,7 @@
 colldata module
 ===============
 
-.. automodule:: colldata
+.. automodule:: opeth.colldata
     :members:
     :undoc-members:
     :show-inheritance:

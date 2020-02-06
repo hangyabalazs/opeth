@@ -1,7 +1,7 @@
 openephys module
 ================
 
-.. automodule:: openephys
+.. automodule:: opeth.openephys
     :members:
     :undoc-members:
     :show-inheritance:

@@ -10,4 +10,5 @@
    gui
    logsetup
    openephys
+   pgext
    spike_gui
