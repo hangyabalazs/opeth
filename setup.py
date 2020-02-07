@@ -3,9 +3,11 @@ import setuptools
 with open("README.rst", "r") as fh:
     long_description = fh.read()
 
+exec(open('opeth/version.py').read())
+
 setuptools.setup(
     name="opeth",
-    version="0.1.3",
+    version=__version__,
     author="Andras Szell",
     author_email="szell.andris@gmail.com",
     description="Online Peri-Event Histogram for Open Ephys ZMQ plugin",
@@ -21,6 +23,10 @@ setuptools.setup(
         "Operating System :: OS Independent",
         "Intended Audience :: Science/Research",
     ],
+    project_urls={
+        'Documentation': 'https://opeth.readthedocs.io/en/latest',
+        'Source': 'https://github.com/hangyabalazs/opeth',
+    },
     entry_points = {
         'console_scripts': ['opeth=opeth.gui:main'],
     },
@@ -28,7 +34,7 @@ setuptools.setup(
     install_requires=[
       'pyqtgraph',
       'pyzmq',
-      'PySide2'
+      'PySide'
     ],
     include_package_data=True,
     python_requires='<3.8',

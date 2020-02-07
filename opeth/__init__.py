@@ -1,4 +1,4 @@
-# Copyright 2019 Andras Szell and other Hangyalab members
+# Copyright (C) 2019-2020 Andras Szell and other Hangyalab members
 # ZMQ interface code is based on python sample scripts from Francesco Battaglia.
 #
 # This software is licensed to you under the GNU General Public
@@ -10,3 +10,4 @@
 # have received a copy of GPLv3 along with this software; if not, see
 # https://www.gnu.org/licenses/gpl-3.0.txt.
 
+from opeth.version import __version__
