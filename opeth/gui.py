@@ -28,9 +28,12 @@ from pyqtgraph.parametertree import Parameter, ParameterTree
 import pyqtgraph as pg
 from pyqtgraph.dockarea import DockArea, Dock
 
-import opeth.logsetup as logsetup
+# hack to make gui.py directly runnable even if it is part of opeth module
+sys.path.append( os.path.join( os.path.dirname(__file__), os.path.pardir ) )
+
+from opeth import logsetup
 from opeth.spike_gui import SpikeEvalGui
-import opeth.pgext as pgext
+from opeth import pgext
 from opeth.comm import CommProcess
 from opeth.colldata import DataProc, EVENT_ROI, SAMPLES_PER_SEC, SPIKE_HOLDOFF
 

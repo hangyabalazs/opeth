@@ -19,8 +19,8 @@ import numpy as np
 import uuid
 import json
 
-from opeth.openephys import OpenEphysEvent, OpenEphysSpikeEvent
-from opeth.colldata import Collector
+from .openephys import OpenEphysEvent, OpenEphysSpikeEvent
+from .colldata import Collector
 
 class CommProcess(object):
     '''ZMQ communication process - stores data, called periodically from GUI process.

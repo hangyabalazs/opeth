@@ -24,8 +24,8 @@ import math
 from collections import OrderedDict, deque, defaultdict
 #from matplotlib import pyplot as plt
 
-from opeth.openephys import generate_ttl
-from opeth.circbuff import CircularBuffer
+from .openephys import generate_ttl
+from .circbuff import CircularBuffer
 
 EVENT_ROI = (-0.02, 0.05)       #: Region of interest in seconds (+-timestamp range in seconds - neighbourhood of a event that is investigated for spikes)
 
