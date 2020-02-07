@@ -1,6 +1,8 @@
 OPETH
 =====
 
+More detailed documentation: https://opeth.readthedocs.io/
+
 .. rtd-inclusion-marker-do-not-remove
 
 Online Peri-Event Time Histogram for `Open Ephys <http://www.open-ephys.org/gui>`_.
@@ -15,21 +17,43 @@ Usage
   For Windows a `precompiled dll <https://github.com/bandita137/ZMQInterface/releases/download/v0.2-pre/ZMQInterface.dll>`_ is present. 
 - Set up Open Ephys with ZMQInterface plugin. Plugin is recommended to be put after bandpass 
   filter and/or common average reference filter, but spike detector is not required.
-- Start ``opeth/gui.py``.
+- Start with the ``opeth`` command if using the pip package or start with ``python opeth/gui.py`` if running from sources.
 
 Installation
 ------------
 
-Setting up python environment (auto)
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+Install the opeth package for Python 2.7 or Python <=3.7 with pip::
 
-Using conda/miniconda, create a new environment issuing the command
+    pip install opeth
 
-::
+Python 3.8 support is partially broken as of February 2020.
 
-    conda create --name opeth --file requirements.txt python=3.7
+Dependencies
+^^^^^^^^^^^^
 
-in the root dir of opeth, which will install all necessary prerequisites. 
+Required non-default packages: pyzmq, pyqtgraph plus one of the qt versions for pyqtgraph, preferably PyQt5,
+and also their dependencies (e.g. numpy).
+
+Running from sources
+--------------------
+
+After cloning the git repository or extracting a source zip file, multiple methods could work.
+
+Setting up python environment with conda
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+Conda builds are not available yet.
+
+Using conda/miniconda, create an ``opeth`` environment issuing the following command in the root dir of opeth::
+
+    conda env create --file environment.yml 
+     
+which will install all necessary prerequisites for Python 3.7.
+
+Using python 3.8 is not recommended (Feb 2020) as some bugs are need to be addressed (most probably residing in pyqtgraph),
+but possible using the conda-forge version of pyqtgraph::
+
+    conda env create --file env38.yml
 
 Activate the new environment with the command
 
@@ -43,21 +67,15 @@ and once activated you may start OPETH with
 
     python opeth/gui.py
 
-Python 3.8
-^^^^^^^^^^
+Setting up python environment with pip
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-As of Jan 2020, Python 3.8 is not installed by default for conda, neither was it actively tested.
+Python 3.7 dependencies can be installed with the command
 
-One may use the command::
+::
 
-    conda env create --file environment.yml
+    pip install -r requirements.txt
 
-to set up an ``opeth`` environment for Python 3.8 using the conda-forge version of pyqtgraph, but be prepared for issues in pyqtgraph.
-
-Setting up python environment (manually)
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-
-Required non-default packages: pyzmq, pyqtgraph (and one of the qt versions for pyqtgraph).
 
 Contributors
 ------------
@@ -65,7 +83,7 @@ Contributors
 Developed by Andras Szell (szell.andris@gmail.com) and other Hangyalab members (http://hangyalab.koki.hu/).
 
 Open Ephys ZMQ plugin connection is based on 
-`sample python scripts <https://github.com/MemDynLab/ZMQInterface/tree/master/python_clients>`_ by Francesco Battaglia.
+`sample python scripts <https://github.com/MemDynLab/ZMQInterface/tree/master/python_clients>`_ created by Francesco Battaglia.
 
 License
 -------

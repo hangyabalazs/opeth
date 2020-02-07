@@ -1,0 +1,9 @@
+# This file may be used to create an environment using:
+# $ conda env create [--name <env>] --file <this file>
+name: opeth
+channels:
+    - conda-forge
+dependencies:
+    - python>=3.8
+    - pyzmq
+    - pyqtgraph

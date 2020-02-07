@@ -3,3 +3,4 @@ docs/build
 docs/logs.txt
 build
 dist
+/logs.txt

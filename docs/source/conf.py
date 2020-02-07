@@ -14,13 +14,14 @@
 #
 import os
 import sys
+
 sys.path.insert(0, os.path.abspath('../..'))
 
 
 # -- Project information -----------------------------------------------------
 
 project = 'OPETH'
-copyright = '2019, Andras Szell and other contributors'
+copyright = '2019-2020, Andras Szell and other contributors'
 author = 'Andras Szell'
 
 # The short X.Y version

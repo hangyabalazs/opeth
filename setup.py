@@ -34,8 +34,11 @@ setuptools.setup(
     install_requires=[
       'pyqtgraph',
       'pyzmq',
-      'PySide'
+      'pyqt5;python_version>="3"',
+      # python 2.7 support:
+      'enum;python_version<"3"',
+      'python-qt5;python_version<"3"',
     ],
     include_package_data=True,
-    python_requires='<3.8',
+    #python_requires='<3.8',
 )
