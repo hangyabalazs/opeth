@@ -7,17 +7,17 @@ More detailed documentation: https://opeth.readthedocs.io/
 
 Online Peri-Event Time Histogram for `Open Ephys <http://www.open-ephys.org/gui>`_.
 
-Performs spike detection based on raw Open Ephys data exported via `ZeroMQ <https://zeromq.org>`_. 
-Requires triggers from Open Ephys for histogram display as spikes are detected around them.
+OPETH visualizes Peri-Event Time Histograms (PETH) of spikes detected in raw Open Ephys data, 
+broadcasted via `ZeroMQ <https://zeromq.org>`_. PETH is aligned to triggers from Open Ephys.
 
 Usage
 -----
 
-- Needs `ZMQInterface plugin <https://github.com/bandita137/ZMQInterface>`_ (e.g. in the Open Ephys plugin folder). 
-  For Windows a `precompiled dll <https://github.com/bandita137/ZMQInterface/releases/download/v0.2-pre/ZMQInterface.dll>`_ is present. 
-- Set up Open Ephys with ZMQInterface plugin. Plugin is recommended to be put after bandpass 
-  filter and/or common average reference filter, but spike detector is not required.
-- Start with the ``opeth`` command if using the pip package or start with ``python opeth/gui.py`` if running from sources.
+- OPETH requires `ZMQInterface plugin <https://github.com/bandita137/ZMQInterface>`_ (e.g. in the Open Ephys plugin folder). 
+  For Windows a `precompiled dll <https://github.com/bandita137/ZMQInterface/releases/download/v0.2-pre/ZMQInterface.dll>`_ is available. 
+- Set up Open Ephys with ZMQInterface plugin. The ZMQ plugin is recommended to be put after bandpass 
+  filter and/or common average reference filter in the Open Ephys signal chain, while spike detector filter is not required.
+- Start with the ``opeth`` command when using the pip package or start with ``python opeth/gui.py`` when running from sources.
 
 Installation
 ------------
@@ -35,8 +35,8 @@ Then start with::
 Dependencies
 ^^^^^^^^^^^^
 
-Required non-default packages: pyzmq, pyqtgraph plus one of the qt versions for pyqtgraph, preferably PyQt5,
-and also their dependencies (e.g. numpy).
+Required non-default packages: ``pyzmq``, ``pyqtgraph`` plus one of the qt versions for pyqtgraph, preferably ``PyQt5``,
+and also their dependencies (e.g. ``numpy``).
 
 Running from sources
 --------------------
@@ -60,14 +60,14 @@ Activate the new environment with the command
 
     conda activate opeth
 
-and once activated you may start OPETH with
+and once activated, you may start OPETH with
 
 ::
 
     python opeth/gui.py
 
 Using python 3.8 is not recommended (Feb 2020) as some bugs are to be addressed (most probably residing in pyqtgraph),
-but possible using the conda-forge version of pyqtgraph (default environment name will be opeth_python38)::
+but it is possible with the conda-forge version of pyqtgraph (default environment name will be ``opeth_python38``)::
 
     conda env create --file env38.yml
 
