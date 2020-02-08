@@ -22,11 +22,15 @@ Usage
 Installation
 ------------
 
-Install the opeth package for Python 2.7 or Python <=3.7 with pip::
+Simplest way is to install the opeth package for Python 2.7 or Python <=3.7 with pip::
 
     pip install opeth
 
-Python 3.8 support is partially broken as of February 2020.
+Then start with::
+
+    opeth
+
+(Python 3.8 support is partially broken as of February 2020.)
 
 Dependencies
 ^^^^^^^^^^^^
