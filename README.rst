@@ -54,11 +54,6 @@ Using conda/miniconda, create an ``opeth`` environment issuing the following com
      
 which will install all necessary prerequisites for Python 3.7.
 
-Using python 3.8 is not recommended (Feb 2020) as some bugs are need to be addressed (most probably residing in pyqtgraph),
-but possible using the conda-forge version of pyqtgraph::
-
-    conda env create --file env38.yml
-
 Activate the new environment with the command
 
 ::
@@ -70,6 +65,11 @@ and once activated you may start OPETH with
 ::
 
     python opeth/gui.py
+
+Using python 3.8 is not recommended (Feb 2020) as some bugs are to be addressed (most probably residing in pyqtgraph),
+but possible using the conda-forge version of pyqtgraph (default environment name will be opeth_python38)::
+
+    conda env create --file env38.yml
 
 Setting up python environment with pip
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^

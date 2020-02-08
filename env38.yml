@@ -1,6 +1,6 @@
 # This file may be used to create an environment using:
 # $ conda env create [--name <env>] --file <this file>
-name: opeth
+name: opeth_python38
 channels:
     - conda-forge
 dependencies:
