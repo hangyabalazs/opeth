@@ -85,3 +85,9 @@ intensive.
 Logging
 ^^^^^^^
 Log files are created automatically.
+
+Configuration
+^^^^^^^^^^^^^
+Last used configuration file name is stored in the file ``lastini.conf``.
+Configurations are stored in the ini file format, and parsed by the 
+`configparser <https://docs.python.org/3/library/configparser.html>`_ module.

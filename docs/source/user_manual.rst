@@ -29,6 +29,8 @@ possible to run multiple OPETH instances with different settings
 simultaneously. (Connecting over the network could also be possible but not 
 implemented in the GUI currently.)
 
+It is recommended to have Open Ephys set up and started before running OPETH.
+
 OPETH graphical interface
 -------------------------
 
@@ -69,8 +71,11 @@ Parameter description:
    as for classical tetrode recordings, but can be set from 1 to 8 (for single 
    electrodes, stereotrodes etc.) Changing it automatically changes the number 
    of histograms displayed.
- * **Disabled channels:** disable channels that are not to be spike-filtered, e.g.
-   noisy or inactive channels. See screenshot for accepted formats. 
+ * **Disabled channels:** disable channels that are not to be spike-filtered, 
+   e.g. noisy or inactive channels. See screenshot for accepted formats. 
+   OPETH automatically disables and hides the extra 3 gyroscope channels of a
+   32 or 64 channel setup if 35/70 channels are detected (if not desired, 
+   change behaviour with :attr:`opeth.gui.HIDE_AUX_CHANNELS`).
  * **ROI before/after event:** region of interest around trigger. Only this 
    part of the analog data is spike filtered.
  * **Histogram color:** 
@@ -85,9 +90,6 @@ Parameter description:
    
 If multiple triggers fall within the ROI, the same spikes may be detected for 
 the triggers in the overlapping part.
-
-OPETH automatically disables and hides the extra 3 channels if 35/70 channels 
-are detected (disable by :attr:`opeth.gui.HIDE_AUX_CHANNELS`).
 
 Plot handling buttons:
 
@@ -106,17 +108,6 @@ Configuration handling buttons:
    experimental project.
  * **Reset:** restore defaults.
    
-Spike analysis window
-^^^^^^^^^^^^^^^^^^^^^
-
-.. image:: images/spike_view.png
-
-
-
-If the *Update only on spike* option is selected, spike windows are updated 
-when new spikes are detected within the ROI of the trigger; otherwise, spike 
-windows are updated 5 times per second even when no spikes are present.
-
 Raw data window
 ^^^^^^^^^^^^^^^
 
@@ -134,3 +125,32 @@ visualization of input for debugging.
     
 When the stimulus counter is not incrementing, no triggers are received and 
 thus no spike detection will be performed (-> histograms not updated).
+
+Spike analysis window
+^^^^^^^^^^^^^^^^^^^^^
+
+Spike windows are opened pressing the *Open new spike win* button. By opening 
+multiple spike windows it is possible to compare channels side by side,
+but too many open windows will result in poor performance.
+
+.. image:: images/spike_view.png
+
+The window consists of two plot parts: the top part shows the raw input around 
+the event, and the bottom part displays the detected spikes within the ROI of 
+the event. The spike position is marked with a red dot in the bottom plots. 
+These spikes are overlaid in the top plot in color and make it easy to 
+differentiate valid spikes from false positives. It is possible to zoom in/out 
+holding down the right mouse button in the spike windows.
+
+Each spike window displays data for a single channel. The *channel 
+number* can be adjusted real-time. 
+
+If the *Update only on spike* option is selected, spike windows are updated 
+when new spikes are detected within the ROI of the trigger; otherwise, spike 
+windows are updated 5 times per second even when no spikes are present.
+
+Spike detection
+---------------
+
+OPETH performs simple spike detection with threshold crossing detection. No 
+spike sorting or artefact removal is performed.
