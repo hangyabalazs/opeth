@@ -472,6 +472,28 @@ class DataProc(object):
 
         return spikepositions, spikestamps
         
+    def spikedetect_r(self, data, timestamps, threshold = SPIKE_THRESHOLD, rising_edge = False, disabled = []):        
+        enabled_idx = np.array([i for i in range(data.shape[0]) if i not in disabled])
+        filt_data = data[enabled_idx]
+
+        thresholded = filt_data <= threshold
+        thresholded_rolled = np.roll(thresholded, 1)
+
+        over = np.where(np.bitwise_not(thresholded_rolled) * thresholded)
+        within = np.where(thresholded_rolled * np.bitwise_not(thresholded))
+
+        spike_positions = [np.array([], dtype=np.int64)] * data.shape[0]
+
+        for (over_channel, over_t), (within_channel, within_t) in \
+            zip([(c,t) for c,t in zip(over[0], over[1])], [(c,t) for c,t in zip(within[0], within[1])]):
+            if over_channel == within_channel and within_t > over_t:
+                real_channel = enabled_idx[over_channel]
+                spike_pos = np.argmin(data[real_channel, over_t:within_t]) + over_t
+                if len(spike_positions[real_channel]) == 0 or spike_pos > spike_positions[real_channel][-1] + self.spike_holdoff_samples:
+                    spike_positions[real_channel] = np.append(spike_positions[real_channel], spike_pos)
+
+        #print(spike_positions)
+        
     def set_sampling_rate(self, sampling_rate):
         logger.info("Data processor assumes sampling rate %d" % sampling_rate)
         self.spike_holdoff_samples = int(round(SPIKE_HOLDOFF * sampling_rate))

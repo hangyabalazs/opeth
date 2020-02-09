@@ -52,7 +52,7 @@ MAX_TRIGGER_CHANNEL = 8     #: TTL trigger channel is up to 8 for a BNC expansio
 NEGATIVE_THRESHOLD = True   #: Inverted signal - positive threshold value in params mean negative threshold with falling edge detection
 
 DEBUG = False               #: Enable or disable debug mode
-DEBUG_TIMING = False        #: Enable timing prints
+DEBUG_TIMING = True         #: Enable timing prints
 DEBUG_FPS = False           #: Enable frame per sec debug prints
 DEBUG_FPSREPORT_PERIOD = 5  #: FPS debug print update frequency
 
@@ -1311,14 +1311,24 @@ class GuiClass(object):
             data_ts_0 = data_ts - data_ts[0]    # timestamps starting at 0 for first sample
             data_ts_roi = data_ts_0 + self.event_roi[0]           # and to the TTL window (-20ms..+50ms)
 
-            self.timeas.tic("06-spikedetect")
+            self.timeas.tic("06-spikedetect1")
             # todo: check whether spike_ts can be used instead of data_ts[spike_pos[ch]]
 
             spike_pos, spike_ts = self.dataproc.spikedetect(data_at_ttl, data_ts_roi,
                                                             threshold=thresh_levels,
                                                             rising_edge=not NEGATIVE_THRESHOLD,
                                                             disabled = self.disabled_channels)
-
+            self.timeas.toc("06-spikedetect1")
+            #print("Orig detect:", spike_pos)
+            #print("New detect:")
+            
+            #self.timeas.tic("06-spikedetect2")
+            #self.dataproc.spikedetect_r(data_at_ttl, data_ts_roi,
+            #                                                threshold=thresh_levels,
+            #                                                rising_edge=not NEGATIVE_THRESHOLD,
+            #                                                disabled = self.disabled_channels)
+            #self.timeas.toc("06-spikedetect2")
+            
             # Calculate spike times in millisec from sample positions
             # and increment the proper histogram bins based on that value.
             # todo: use vector operations instead of loop? - not a performance bottleneck right now
