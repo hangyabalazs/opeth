@@ -11,15 +11,22 @@ Welcome to OPETH's documentation!
 
 OPETH user documentation
 ------------------------
+
+Detailed user guide: :doc:`user_manual`
+
 .. include:: ../../README.rst
-  :start-after: rtd-inclusion-marker-do-not-remove
+   :start-after: rtd-inclusion-marker-do-not-remove
 
 .. toctree::
-   :maxdepth: 3
-   :caption: Contents:
+   :hidden:
+   :maxdepth: 2
    
+   index
+   user_manual
+   architecture
 
 For developers
 --------------
 
 * :ref:`modindex`
+* :doc:`architecture`
