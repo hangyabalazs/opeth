@@ -13,8 +13,8 @@ broadcasted via `ZeroMQ <https://zeromq.org>`_. PETH is aligned to triggers from
 Usage
 -----
 
-- OPETH requires `ZMQInterface plugin <https://github.com/bandita137/ZMQInterface>`_ (e.g. in the Open Ephys plugin folder). 
-  For Windows a `precompiled dll <https://github.com/bandita137/ZMQInterface/releases/download/v0.2-pre2/ZMQInterface.dll>`_ is available. 
+- OPETH requires `ZMQInterface plugin <https://github.com/aszell/ZMQInterface>`_ (e.g. in the Open Ephys plugin folder). 
+  For Windows a `precompiled dll <https://github.com/aszell/ZMQInterface/releases/download/v0.2-pre2/ZMQInterface.dll>`_ is available. 
 - Set up Open Ephys with ZMQInterface plugin. The ZMQ plugin is recommended to be put after bandpass 
   filter and/or common average reference filter in the Open Ephys signal chain, while spike detector filter is not required.
 - Start with the ``opeth`` command when using the pip package or start with ``python opeth/gui.py`` when running from sources.
