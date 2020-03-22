@@ -1040,9 +1040,16 @@ class GuiClass(object):
 
     def onClearPlot(self):
         '''Manually clear plots on button press.'''
+        if not self.initiated:
+            return
+        
         self.clear_plot()
 
     def onChangeTheme(self):
+        ''' Switch histogram displays between black and white background '''
+        if not self.initiated:
+            return
+            
         if self.display_theme == Theme.dark:
             self.display_theme = Theme.publication
             
