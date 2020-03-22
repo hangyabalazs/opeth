@@ -6,27 +6,31 @@
 Welcome to OPETH's documentation!
 =================================
 
-.. contents:: Table of Contents
-   :local:
-
-OPETH user documentation
-------------------------
-
-Detailed user guide: :doc:`user_manual`
-
-.. include:: ../../README.rst
-   :start-after: rtd-inclusion-marker-do-not-remove
-
 .. toctree::
-   :hidden:
    :maxdepth: 2
-   
-   index
+   :caption: OPETH documentation
+
+   getting_started
    user_manual
    architecture
+   
+Contributors
+------------
+
+Developed by Andras Szell (szell.andris@gmail.com) and other Hangyalab members (http://hangyalab.koki.hu/).
+
+Open Ephys ZMQ plugin connection is based on 
+`sample python scripts <https://github.com/MemDynLab/ZMQInterface/tree/master/python_clients>`_ created by Francesco Battaglia.
+
+License
+-------
+
+GNU General Public License v3.0 or later.
+
+See `LICENSE <https://github.com/hangyabalazs/opeth/blob/master/LICENSE>`_ for the full text.
+
 
 For developers
 --------------
 
 * :ref:`modindex`
-* :doc:`architecture`

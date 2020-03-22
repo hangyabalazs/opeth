@@ -86,7 +86,7 @@ class Collector(object):
         now = clock()
 
     def add_data(self, data):
-        '''Append a new set of analog channel measurements to the end of the storage array.
+        '''Append a new chunk of analog channel measurements to the end of the storage array.
         
         Auxiliary channel data (gyroscopes) are automatically removed if 35 or 70 channels 
         were received (ch 33-35 or ch 65-70) and :attr:`drop_aux` is True.

@@ -10,14 +10,14 @@ Online Peri-Event Time Histogram for `Open Ephys <http://www.open-ephys.org/gui>
 OPETH visualizes Peri-Event Time Histograms (PETH) of spikes detected in raw Open Ephys data, 
 broadcasted via `ZeroMQ <https://zeromq.org>`_. PETH is aligned to triggers from Open Ephys.
 
-Usage
------
+Quickstart
+----------
 
-- OPETH requires `ZMQInterface plugin <https://github.com/aszell/ZMQInterface>`_ (e.g. in the Open Ephys plugin folder). 
-  For Windows a `precompiled dll <https://github.com/aszell/ZMQInterface/releases/download/v0.2-pre2/ZMQInterface.dll>`_ is available. 
+- OPETH requires `ZMQInterface plugin <https://github.com/open-ephys-plugins/ZMQPlugins/tree/master/ZMQInterface>`_. 
+  It is part of Open Ephys from version 0.4.6 up.
 - Set up Open Ephys with ZMQInterface plugin. The ZMQ plugin is recommended to be put after bandpass 
   filter and/or common average reference filter in the Open Ephys signal chain, while spike detector filter is not required.
-- Start with the ``opeth`` command when using the pip package or start with ``python opeth/gui.py`` when running from sources.
+- Start with the ``opeth`` command when using the pip package or start with ``python opeth/gui.py`` when running from sources (see below).
 
 Installation
 ------------
@@ -30,7 +30,7 @@ Then start with::
 
     opeth
 
-(Python 3.8 support is partially broken as of February 2020.)
+(Python 3.8 support is partially broken until the release of pyqtgraph 0.11.)
 
 Dependencies
 ^^^^^^^^^^^^
@@ -81,17 +81,3 @@ Python 3.7 dependencies can be installed with the command
     pip install -r requirements.txt
 
 
-Contributors
-------------
-
-Developed by Andras Szell (szell.andris@gmail.com) and other Hangyalab members (http://hangyalab.koki.hu/).
-
-Open Ephys ZMQ plugin connection is based on 
-`sample python scripts <https://github.com/MemDynLab/ZMQInterface/tree/master/python_clients>`_ created by Francesco Battaglia.
-
-License
--------
-
-GNU General Public License v3.0 or later.
-
-See `LICENSE <https://github.com/hangyabalazs/opeth/blob/master/LICENSE>`_ for the full text.
