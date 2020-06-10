@@ -7,10 +7,7 @@ Heavily based on Francesco Battaglia's sample implementation.
 '''
 from __future__ import print_function
 import sys
-if sys.version_info.major >= 3:
-    from time import perf_counter as clock
-else:
-    from time import clock
+from timeit import default_timer
 
 import time
 import logging
@@ -21,6 +18,8 @@ import json
 
 from .openephys import OpenEphysEvent, OpenEphysSpikeEvent
 from .colldata import Collector
+
+COMMPROCESS_MAX_POLLTIME = 0.1    # max amount of time that can be spent in the communication loop before returning
 
 class CommProcess(object):
     '''ZMQ communication process - stores data, called periodically from GUI process.
@@ -148,8 +147,12 @@ class CommProcess(object):
             if np.random.random() < 0.005:
                 self.send_event(event_type=3, sample_num=0, event_id=self.event_no, event_channel=1)
 
-        while True:
+        start = default_timer()
+        timeout = start + COMMPROCESS_MAX_POLLTIME   # spend maximum this amount of time in the loop
+
+        while default_timer() < timeout:
             if (time.time() - self.last_heartbeat_time) > 2.:
+
                 # Send every two seconds a "heartbeat" so that Open Ephys knows we're alive
                 # and also check for response
                 if self.socket_waits_reply:
@@ -161,8 +164,8 @@ class CommProcess(object):
                         self.poller.unregister(self.event_socket)
                         self.event_socket.close()
                         self.event_socket = self.context.socket(zmq.REQ)
-                        self.event_socket.connect("tcp://localhost:5557")
-                        self.poller.register(self.event_socket)
+                        self.event_socket.connect("tcp://localhost:%d" % self.eventport)
+                        self.poller.register(self.event_socket, zmq.POLLIN)
                         self.socket_waits_reply = False
                         self.last_reply_time = time.time()
                 else:
@@ -192,17 +195,17 @@ class CommProcess(object):
 
                     if self.isStats: # statistics
                         if self.msgstat_start is None:
-                            self.msgstat_start = clock()
+                            self.msgstat_start = default_timer()
 
                         self.msgstat_size.append(len(message[1]))
 
-                        if self.msgstat_start + 1 < clock():
+                        if self.msgstat_start + 1 < default_timer():
                             logger.debug(len(self.msgstat_size))
                             sizes, counts = np.unique(self.msgstat_size, return_counts=True)
                             logger.debug(sizes, counts)
                             logger.debug(sum(counts), "messages", sum(self.msgstat_size), "bytes")
                             self.msgstat_size = []
-                            self.msgstat_start = clock()
+                            self.msgstat_start = default_timer()
 
                     if self.message_no != -1 and header['message_no'] != self.message_no + 1:
                         logger.error("Missing a message at number %d", self.message_no)
@@ -267,6 +270,9 @@ class CommProcess(object):
                     logger.info("???? Getting a reply before a send?")
         if events:
             pass  # TODO implement the event passing
+
+        if timeout < default_timer():
+            logger.info("Abort due to timeout")
 
         return True
 
