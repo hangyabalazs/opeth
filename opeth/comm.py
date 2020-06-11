@@ -59,6 +59,8 @@ class CommProcess(object):
         self.msgstat_start = None
         self.msgstat_size = []
         self.collector = Collector()
+        
+        self.channels = 0
 
         logger.debug("ZMQ: dataport %d, eventport %d" % (dataport, eventport))
 
@@ -73,6 +75,12 @@ class CommProcess(object):
         elif event.type == 'TTL' and event.event_id == 1: # rising edge TTL
             self.collector.add_ttl(event)
 
+    def adjust_channels(self, channels):
+        if channels != self.channels:
+            logger.info("Channel count changed: %d -> %d" % (self.channels, channels))
+            self.channels = channels
+            self.collector.update_channels(channels)            
+            
     # noinspection PyMethodMayBeStatic
     def add_spike(self, spike):
         '''Add spikes. Currently not used.'''
@@ -214,6 +222,7 @@ class CommProcess(object):
                         c = header['content']
                         n_samples = c['n_samples']
                         n_channels = c['n_channels']
+                        self.adjust_channels(n_channels)
                         n_real_samples = c['n_real_samples']
 
                         # new version of the ZMQ plugin: data packets contain timestamps as well

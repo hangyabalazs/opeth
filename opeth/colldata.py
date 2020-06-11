@@ -19,7 +19,7 @@ else:
     
 import time
 import logging
-import  numpy as np
+import numpy as np
 import math
 from collections import OrderedDict, deque, defaultdict
 #from matplotlib import pyplot as plt
@@ -59,6 +59,7 @@ class Collector(object):
     def __init__(self):
         
         self.timestamp = 0
+        self.channels = 0
         
         self.databuffer = None
         self.tsbuffer = None
@@ -71,6 +72,19 @@ class Collector(object):
         self.set_sampling_rate(SAMPLES_PER_SEC)
 
         self.drop_aux = False
+        
+    def update_channels(self, channels):
+        ''' Called when number of channels in data packets differ from previous '''
+        
+        # todo: instead of abort reinitialize GUI properly when number of channels change
+        if channels != self.channels:
+            if self.channels ==  0:
+                self.channels = channels
+            else:
+                logger.error("Channel count changed from %d to %d, please restart OPETH" % 
+                    (self.channels, channels))
+                
+                exit()
         
     def update_ts(self, timestamp):
         '''Required for old OE version that sent timestamps separately as events,
@@ -98,7 +112,7 @@ class Collector(object):
             data: input data received from OE. Multiple channels, multiple samples.
                 (E.g. 35 rows/channels of 640 floating point samples.) Unit value is supposed to be in uV.
         '''
-    
+        
         # we accept only 2D arrays!
         assert(len(data.shape) == 2)
         
