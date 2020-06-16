@@ -150,7 +150,7 @@ class GuiClass(object):
 
         # plotting stats
         self.framecnt = 0
-        self.lastreport = default_timer()
+        self.last_fps_report = default_timer()
         self.lastframecnt = 0
         self.elapsed = 0
         self.fpslist = []
@@ -1146,17 +1146,17 @@ class GuiClass(object):
         self.framecnt += 1
 
         # diagram update frequency statistics
-        if default_timer() - self.lastreport > DEBUG_FPSREPORT_PERIOD:
-            fps = (self.framecnt - self.lastframecnt) / (default_timer() - self.lastreport)
+        if DEBUG_FPS and (default_timer() - self.last_fps_report > DEBUG_FPSREPORT_PERIOD):
+            fps = (self.framecnt - self.lastframecnt) / (default_timer() - self.last_fps_report)
             self.fpslist.append(fps)
-            if DEBUG_FPS:
-                logger.info("\r%.1f updates / sec [%.1f - %.1f], compr: %.3f @ %.1f" % (
-                               fps, min(self.fpslist), max(self.fpslist),
-                               self.elapsed, default_timer() - self.starttime))
+            
+            logger.info("\r%.1f updates / sec [%.1f - %.1f], compr: %.3f @ %.1f" % (
+                           fps, min(self.fpslist), max(self.fpslist),
+                           self.elapsed, default_timer() - self.starttime))
 
             if len(self.fpslist) > 50:
                 self.fpslist = self.fpslist[-50:]
-            self.lastreport = default_timer()
+            self.last_fps_report = default_timer()
             self.lastframecnt = self.framecnt
             self.elapsed = 0
 
