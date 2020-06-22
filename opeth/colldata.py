@@ -69,9 +69,13 @@ class Collector(object):
         self.prev_trigger_ts = defaultdict(int)
         self.starttime = clock()
 
-        self.set_sampling_rate(SAMPLES_PER_SEC)
+        self.set_sampling_rate(1) # will be overridden when first data packet is received
 
         self.drop_aux = False
+
+    def update_samprate(self, samprate):
+        '''Called when first data packet arrives, and any time when sampling rate changes'''
+        self.set_sampling_rate(samprate)
         
     def update_channels(self, channels):
         ''' Called when number of channels in data packets differ from previous '''
@@ -276,7 +280,7 @@ class Collector(object):
                 # We have a TTL for the proper channel, let's check whether a timestamp jump has occured
                 # If ttl timestamp is far in the future (compared to data) we drop it, as it is probably 
                 #  a remainder of a previous OE play session
-                logger.info("Dropping TTL timestamp ", ttl.timestamp, "- last data ts: ", self.tsbuffer[-1])
+                logger.info("Dropping TTL timestamp %d - last data ts: %d" % (ttl.timestamp, self.tsbuffer[-1]))
                 self.ttls.popleft()
                 continue
             else:
@@ -326,9 +330,14 @@ class Collector(object):
         self.drop_aux = should_drop
         
     def set_sampling_rate(self, sampling_rate):
+        '''Update sampling rate - will also be queried by GUI'''
+        assert(sampling_rate > 0)
         self.samples_per_sec = sampling_rate
         self.timestamp_per_sec = sampling_rate # current open ephys report timestamps as sample index
         self.max_data_amount = 2 * self.timestamp_per_sec   #: Buffering limit (sample count)
+        
+    def get_sampling_rate(self):
+        return self.samples_per_sec
 
 class DataProc(object):
     '''Utility functions to handle collected data

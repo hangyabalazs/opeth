@@ -17,7 +17,7 @@ import uuid
 import json
 
 from .openephys import OpenEphysEvent, OpenEphysSpikeEvent
-from .colldata import Collector
+from .colldata import Collector, SAMPLES_PER_SEC
 
 COMMPROCESS_MAX_POLLTIME = 0.1    # max amount of time that can be spent in the communication loop before returning
 
@@ -60,6 +60,7 @@ class CommProcess(object):
         self.msgstat_size = []
         self.collector = Collector()
         
+        self.samprate = -1
         self.channels = 0
 
         logger.debug("ZMQ: dataport %d, eventport %d" % (dataport, eventport))
@@ -75,11 +76,18 @@ class CommProcess(object):
         elif event.type == 'TTL' and event.event_id == 1: # rising edge TTL
             self.collector.add_ttl(event)
 
+    def adjust_samprate(self, samprate):
+        ''' When a new sampling rate is detected in the data, we alert the upper layers '''
+        if samprate != self.samprate:
+            logger.info("Sampling rate changed: %d -> %d" % (self.samprate, samprate))
+            self.samprate = samprate
+            self.collector.update_samprate(samprate)
+            
     def adjust_channels(self, channels):
         if channels != self.channels:
             logger.info("Channel count changed: %d -> %d" % (self.channels, channels))
             self.channels = channels
-            self.collector.update_channels(channels)            
+            self.collector.update_channels(channels)
             
     # noinspection PyMethodMayBeStatic
     def add_spike(self, spike):
@@ -224,6 +232,12 @@ class CommProcess(object):
                         n_channels = c['n_channels']
                         self.adjust_channels(n_channels)
                         n_real_samples = c['n_real_samples']
+                        
+                        if 'sample_rate' in c:
+                            self.adjust_samprate(c['sample_rate'])
+                        else:
+                            # use defaults if old protocol messages were used
+                            self.adjust_samprate(SAMPLES_PER_SEC)
 
                         # new version of the ZMQ plugin: data packets contain timestamps as well
                         if 'timestamp' in c:

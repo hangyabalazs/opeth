@@ -257,6 +257,8 @@ class GuiClass(object):
         if clear_plot:
             self.clear_plot()
         
+        self.par_sampling_rate.setValue(sampling_rate)
+        
         logger.info("New sampling rate: %d" % self.sampling_rate)
 
     def update_plotstyle(self):
@@ -796,9 +798,10 @@ class GuiClass(object):
 
         for param, change, data in changes:
             if change == 'value':
-                if param == self.par_sampling_rate:
-                    self.update_samplingrate(data)
-                elif param == self.par_common_thresh:
+                # sampling rate is now auto-updated, no manual changes possible / necessary
+                #if param == self.par_sampling_rate:
+                #    self.update_samplingrate(data)
+                if param == self.par_common_thresh:
                     self.set_threshold_levels(data)
                     need_threshupdate = True
                 elif param == self.par_ttlroi_before:
@@ -889,7 +892,7 @@ class GuiClass(object):
         cfg.set("plot", "channels_per_plot", str(self.par_ch_per_plot.value()))
 
         cfg.add_section("processing")
-        cfg.set("processing", "sampling_rate", str(self.par_sampling_rate.value()))
+        #cfg.set("processing", "sampling_rate", str(self.par_sampling_rate.value()))
         cfg.set("processing", "ttl_trigger_channel", str(self.par_ttl_src.value()))
         cfg.set("processing", "roi_before", str(self.par_ttlroi_before.value()))
         cfg.set("processing", "roi_after", str(self.par_ttlroi_after.value()))
@@ -927,12 +930,12 @@ class GuiClass(object):
             channels_per_plot = max(min(MAX_CHANNELS_PER_PLOT, channels_per_plot), 1)
             self.par_ch_per_plot.setValue(channels_per_plot)
 
-        if cfg.has_option("processing", "sampling_rate"):
-            sampling_rate = cfg.getint("processing", "sampling_rate")
-            self.par_sampling_rate.setValue(sampling_rate)
-        else:
-            sampling_rate = self.par_sampling_rate.value()            
-        self.update_samplingrate(sampling_rate, clear_plot=False)
+        #if cfg.has_option("processing", "sampling_rate"):
+        #    sampling_rate = cfg.getint("processing", "sampling_rate")
+        #    self.par_sampling_rate.setValue(sampling_rate)
+        #else:
+        #    sampling_rate = self.par_sampling_rate.value()
+        #self.update_samplingrate(sampling_rate, clear_plot=False)
 
         if cfg.has_option("processing", "roi_before"):
             before = cfg.getfloat("processing", "roi_before")
@@ -1176,6 +1179,14 @@ class GuiClass(object):
                 exit()
             self.ttl_range_ms = int(round( (self.event_roi[1] - self.event_roi[0]) / HISTOGRAM_BINSIZE))
             self.spike_bin_ms = np.zeros((self.cp.collector.channel_cnt(), self.ttl_range_ms + 1))
+
+
+        # check for possible sampling rate changes
+        new_samprate = self.cp.collector.get_sampling_rate()
+        
+        if self.initiated and (new_samprate != self.sampling_rate):
+            logger.info("Detected sampling rate change: %d -> %d" % (self.sampling_rate, new_samprate))
+            self.update_samplingrate(new_samprate, clear_plot=True)
 
         # wait until threshold params set up...
         if self.threshold_levels is None:
