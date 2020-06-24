@@ -37,6 +37,7 @@ from opeth import pgext
 from opeth.comm import CommProcess
 from opeth.colldata import DataProc, EVENT_ROI, SAMPLES_PER_SEC, SPIKE_HOLDOFF
 from opeth.debug import TimeMeasClass     # used for DEBUG_TIMING
+from opeth.version import __version__
 
 AUTOTRIGGER_CH = None       #: Set to None to disable, otherwise TTL pulses will be generated if given channel is over threshold
 HISTOGRAM_BINSIZE = 0.001   #: Histogram bin size in seconds
@@ -1375,6 +1376,7 @@ def sigint_handler(*args):
 logger = logsetup.init_logs("logs.txt")
 
 def main():
+    logger.info("OPETH v%s started" % __version__)
     app = QtGui.QApplication([])
     ui = GuiClass()
 
